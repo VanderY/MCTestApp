@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  back:
+    build:
+      context: docker/back
+      dockerfile: Dockerfile
+    volumes:
+      - ./back:/var/code/back
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+  postgres:
+    build:
+      context: docker/db
+      dockerfile: Dockerfile
+    volumes:
+      - database:/var/lib/postgresql/data
+    ports:
+      - "54321:5432"
+    environment:
+      - LC_ALL=C.UTF-8
+      - POSTGRES_DB=testdb
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=pass
+  front:
+    build:
+      context: docker/front
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - back
+    volumes:
+      - ./front:/code/front
+
+volumes:
+  database:
+    driver: local
